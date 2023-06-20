@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/TrHung-297/chat-v2/biz/core/chat"
 	"github.com/TrHung-297/chat-v2/dto"
 	"github.com/TrHung-297/chat-v2/herror"
 	"github.com/TrHung-297/chat-v2/infrastructure/util"
 	"github.com/TrHung-297/chat-v2/module/account/repository"
+	"github.com/TrHung-297/fountain/baselib/base"
 	"github.com/TrHung-297/fountain/baselib/redis_client"
 	"github.com/TrHung-297/fountain/biz/dal/dao"
 	"time"
@@ -79,6 +81,15 @@ func (service *AccountService) CheckPasswordCorrect(userName string, password st
 
 	service.CacheRepository.Get().HSet(ctx, "why", "ok", "dd")
 	service.CacheRepository.Get().SAdd(ctx, "myredis:11", "ok")
+
+	data := &struct {
+		UserId string `json:"UserId"`
+		Locked bool   `json:"Locked"`
+	}{
+		UserId: "123456",
+		Locked: true,
+	}
+	go chat.PublishToTopic("chat-topic", base.JSONDebugDataString(data))
 
 	if userName == "hungts" && password == "123456" {
 		accountData["UserId"] = "hihi"
